@@ -9,22 +9,40 @@ class AnagramTests(unittest.TestCase):
   SOLUTION2 = 'wordlists/result2.txt'
 
   def setUp(self):
-    self._anagram1 = anagram.Anagram(AnagramTests.WORDLIST1)
-    self._anagram2 = anagram.Anagram(AnagramTests.WORDLIST2)
+    self._anagrams = dict()
+    self.get(AnagramTests.WORDLIST1)
+    self.get(AnagramTests.WORDLIST2)
+
+
+  def get(self, path):
+    return self._anagrams.setdefault(path, anagram.Anagram(path))
+
+  def test_aaBuiltCorrectly(self):
+    for pair in self._anagrams.items():
+      path = pair[0]
+      anagram = pair[1]
+
+      words = self._getLines(path)
+      for word in words:
+        print "has", word
+        self.assertTrue( anagram.has(word) )
+    
 
   def test_oneWord(self):
-    solution = self._getSolution(AnagramTests.WORDLIST1)
+    anagram = self.get(AnagramTests.WORDLIST1)
+    solution = self._getLines(AnagramTests.WORDLIST1)
     start = solution[0]
-    out = list(self._anagram1.solve(start, len(solution) + 1))
+    out = list(anagram.solve(start, len(solution) + 1))
     self.assertEqual(sorted(solution),sorted(out))
 
   def test_twoWords(self):
-    solution = self._getSolution(AnagramTests.SOLUTION2)
+    anagram = self.get(AnagramTests.WORDLIST2)
+    solution = self._getLines(AnagramTests.SOLUTION2)
     start = solution[0]
-    out = list(self._anagram2.solve(start, len(solution) + 1))
+    out = list(anagram.solve(start, len(solution) + 1))
     self.assertEqual(sorted(solution), sorted(out))
 
-  def _getSolution(self, filename):
+  def _getLines(self, filename):
     solution = []
     with open(filename) as fp:
       for line in fp:

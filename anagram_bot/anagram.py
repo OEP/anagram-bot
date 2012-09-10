@@ -34,6 +34,18 @@ class Anagram:
         break
       yield solution
 
+  def has(self, key):
+    """Returns true if 'key' is present in trie."""
+    if len(key) == 0 or key == None:
+      raise ValueError("Key can't be length 0 or None.")
+    node = self._getRoot(key[0])
+    for c in key[1:]:
+      if node == None:
+        return False
+      node = node._get(c)
+    return node != None and node._isTerminal()
+    
+
 
   def _solveRecursive(self, charmap, key):
     keys = set(charmap.keys()) & set(self._roots.keys())
@@ -97,7 +109,7 @@ class Anagram:
           prefix = self._letter
 
           if key == None:
-            solutionGen = self._parent.solve(tmpMap, sortKey)
+            solutionGen = self._parent._solveRecursive(tmpMap, sortKey)
             prefix += " "
           else:
             node = self._get(key)
@@ -117,7 +129,7 @@ class Anagram:
       return self._nextMap.get(letter)
 
     def _setDefault(self, letter):
-      return self._nextMap.setdefault(letter, Anagram.Node(self, letter))
+      return self._nextMap.setdefault(letter, Anagram.Node(self._parent, letter))
 
     def __str__(self):
       return self._letter
