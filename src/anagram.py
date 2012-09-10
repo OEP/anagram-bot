@@ -16,6 +16,28 @@ class Anagram:
     for word in fp:
       self._addWord(word.upper().strip())
 
+  def solve(self, cipher, maxSolutions=1, key=lambda x:x):
+    charmap = self._formatCipher(cipher)
+    keys = set(charmap.keys()) & set(self._roots.keys())
+    solutions = 0
+
+    for char in sorted(keys, key=key):
+      tmpMap = dict(charmap)
+      tmpMap[char] -= 1
+      for solution in self._roots[char].solve(tmpMap, key):
+        solutions += 1
+        yield solution
+
+        if solutions >= maxSolutions:
+          break
+
+  
+  def _formatCipher(self, cipher):
+    charmap = dict()
+    for c in cipher.upper():
+      charmap[c] = 1 + charmap.get(c, 0)
+    return charmap
+
   def _getRoot(self, char):
     """Returns a root node representing 'char'."""
     return self._roots.get(char, None)
@@ -48,6 +70,9 @@ class Anagram:
 
     def _flagTerminal(self):
       self._nextMap[None] = None
+
+    def _isTerminal(self):
+      return None in self._nextMap
 
     def _get(self, letter):
       return self._nextMap.get(letter)
