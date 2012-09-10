@@ -1,6 +1,13 @@
 """
 Anagram class.
 """
+def _deductKey(someDict, letter):
+  """Creates a copy of 'someDict', deducts key 'letter' and deletes."""
+  tmpDict = dict(someDict)
+  tmpDict[letter] -= 1
+  if tmpDict[letter] <= 0:
+    del tmpDict[letter]
+  return tmpDict
 
 class Anagram:
   
@@ -16,20 +23,22 @@ class Anagram:
     for word in fp:
       self._addWord(word.upper().strip())
 
+    fp.close()
+
   def solve(self, cipher, maxSolutions=1, key=lambda x:x):
     charmap = self._formatCipher(cipher)
     keys = set(charmap.keys()) & set(self._roots.keys())
     solutions = 0
 
     for char in sorted(keys, key=key):
-      tmpMap = dict(charmap)
-      tmpMap[char] -= 1
-      for solution in self._roots[char].solve(tmpMap, key):
-        solutions += 1
-        yield solution
-
+      if solutions >= maxSolutions:
+        break
+      for solution in self._roots[char].solve(charmap, key):
         if solutions >= maxSolutions:
           break
+        solutions += 1
+        if solution != None:
+          yield solution
 
   
   def _formatCipher(self, cipher):
@@ -67,6 +76,24 @@ class Anagram:
     def __init__(self, letter):
       self._letter = letter
       self._nextMap = dict()
+
+    def solve(self, charMap, sortKey):
+      tmpMap = _deductKey(charMap, self._letter)
+      keys = set(tmpMap.keys()) & set(self._nextMap.keys())
+
+      if len(keys) == 0 and self._isTerminal():
+        yield self._letter
+      elif len(keys) == 0:
+        yield None
+      else:
+        for key in sorted(keys, key=sortKey):
+          node = self._get(key)
+          for subSolution in node.solve(tmpMap, sortKey):
+            if subSolution != None:
+              yield self._letter + subSolution
+        
+
+      
 
     def _flagTerminal(self):
       self._nextMap[None] = None
