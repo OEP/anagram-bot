@@ -24,7 +24,6 @@ class AnagramTests(unittest.TestCase):
 
       words = self._getLines(path)
       for word in words:
-        print "has", word
         self.assertTrue( anagram.has(word) )
     
 
@@ -37,11 +36,10 @@ class AnagramTests(unittest.TestCase):
 
   def test_twoWords(self):
     anagram = self.get(AnagramTests.WORDLIST2)
-    solution = sorted(self._getLines(AnagramTests.SOLUTION2))
+    solution = self._getLines(AnagramTests.SOLUTION2)
     start = solution[0]
-    out = sorted(list(anagram.solve(start, len(solution) + 1)))
-    print "solution=",solution
-    print "out=",out
+    solution = set(solution)
+    out = set(anagram.solve(start, len(solution) + 30))
     self.assertEqual(solution, out)
 
   def _getLines(self, filename):
