@@ -1,6 +1,12 @@
 """
 Anagram class.
 """
+
+import string
+import random
+
+anagram_characters = string.ascii_letters
+
 def _deductKey(someDict, letter):
   """Creates a copy of 'someDict', deducts key 'letter' and deletes."""
   tmpDict = dict(someDict)
@@ -9,10 +15,17 @@ def _deductKey(someDict, letter):
     del tmpDict[letter]
   return tmpDict
 
+def filterCipher(charsequence):
+  """Returns allowed set of anagram characters in 'charsequence'."""
+  return filter(lambda x: x in anagram_characters, charsequence)
+
 class Anagram:
+
+  DEFAULT_MAX = 1
+  DEFAULT_KEY = lambda x:x
   
   def __init__(self,
-    wordlist='/usr/share/dict/words',
+    wordlist='wordlists/simple.txt',
     minWordSize=1):
 
     self._minWordSize = minWordSize
@@ -25,8 +38,23 @@ class Anagram:
 
     fp.close()
 
-  def solve(self, cipher, maxSolutions=1, key=lambda x:x):
-    charmap = self._formatCipher(cipher)
+  def pickRandom(self, cipher):
+    """Picks a random anagram of cipher and returns it or None."""
+    result = list(self.solveRandom(cipher,1))
+    if len(result) == 0: return None
+    return result[0]
+
+  def pickFirst(self, cipher):
+    """Picks the first anagram it can find."""
+    result = list(self.solve(cipher,1))
+    if len(result) == 0: return None
+    return result[0]
+  
+  def solveRandom(self, cipher, maxSolutions=DEFAULT_MAX):
+    return self.solve(cipher, maxSolutions, lambda x: random.random())
+
+  def solve(self, cipher, maxSolutions=DEFAULT_MAX, key=DEFAULT_KEY):
+    charmap = self._formatCipher(filterCipher(cipher))
     solutions = 0
 
     for solution in self._solveRecursive(charmap, key):
