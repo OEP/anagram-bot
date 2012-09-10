@@ -13,7 +13,7 @@ class Anagram:
   
   def __init__(self,
     wordlist='/usr/share/dict/words',
-    minWordSize=4):
+    minWordSize=1):
 
     self._minWordSize = minWordSize
     self._roots = dict()

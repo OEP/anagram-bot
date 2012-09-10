@@ -37,10 +37,12 @@ class AnagramTests(unittest.TestCase):
 
   def test_twoWords(self):
     anagram = self.get(AnagramTests.WORDLIST2)
-    solution = self._getLines(AnagramTests.SOLUTION2)
+    solution = sorted(self._getLines(AnagramTests.SOLUTION2))
     start = solution[0]
-    out = list(anagram.solve(start, len(solution) + 1))
-    self.assertEqual(sorted(solution), sorted(out))
+    out = sorted(list(anagram.solve(start, len(solution) + 1)))
+    print "solution=",solution
+    print "out=",out
+    self.assertEqual(solution, out)
 
   def _getLines(self, filename):
     solution = []
