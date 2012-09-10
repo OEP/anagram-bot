@@ -27,16 +27,18 @@ class Anagram:
 
   def solve(self, cipher, maxSolutions=1, key=lambda x:x):
     charmap = self._formatCipher(cipher)
-    keys = set(charmap.keys()) & set(self._roots.keys())
     solutions = 0
 
-    for char in sorted(keys, key=key):
+    for solution in self._solveRecursive(charmap, key):
       if solutions >= maxSolutions:
         break
+      yield solution
+
+
+  def _solveRecursive(self, charmap, key):
+    keys = set(charmap.keys()) & set(self._roots.keys())
+    for char in sorted(keys, key=key):
       for solution in self._roots[char].solve(charmap, key):
-        if solutions >= maxSolutions:
-          break
-        solutions += 1
         if solution != None:
           yield solution
 
@@ -53,7 +55,7 @@ class Anagram:
 
   def _setDefault(self, char):
     """Returns root node for 'char' or create if it does not exist."""
-    return self._roots.setdefault(char, Anagram.Node(char))
+    return self._roots.setdefault(char, Anagram.Node(self, char))
 
   def _addWord(self, word):
     """Adds word to the trie."""
@@ -73,27 +75,37 @@ class Anagram:
 
   class Node:
     
-    def __init__(self, letter):
+    def __init__(self, parent, letter):
       self._letter = letter
       self._nextMap = dict()
+      self._parent = parent
 
     def solve(self, charMap, sortKey):
       tmpMap = _deductKey(charMap, self._letter)
       keys = set(tmpMap.keys()) & set(self._nextMap.keys())
 
-      if len(keys) == 0 and self._isTerminal():
+      if self._isTerminal():
+        keys.add(None)
+
+      if len(tmpMap) == 0 and self._isTerminal():
         yield self._letter
-      elif len(keys) == 0:
-        yield None
+      elif len(tmpMap) == 0:
+        pass
       else:
         for key in sorted(keys, key=sortKey):
-          node = self._get(key)
-          for subSolution in node.solve(tmpMap, sortKey):
-            if subSolution != None:
-              yield self._letter + subSolution
-        
+          solutionGen = None
+          prefix = self._letter
 
-      
+          if key == None:
+            solutionGen = self._parent.solve(tmpMap, sortKey)
+            prefix += " "
+          else:
+            node = self._get(key)
+            solutionGen = node.solve(tmpMap, sortKey)
+
+          for subSolution in solutionGen:
+            if subSolution != None:
+              yield prefix + subSolution
 
     def _flagTerminal(self):
       self._nextMap[None] = None
@@ -105,10 +117,11 @@ class Anagram:
       return self._nextMap.get(letter)
 
     def _setDefault(self, letter):
-      return self._nextMap.setdefault(letter, Anagram.Node(letter))
+      return self._nextMap.setdefault(letter, Anagram.Node(self, letter))
 
     def __str__(self):
       return self._letter
 
     def __repr__(self):
-      return self.__str__()
+      return self.__str__() + " (terminal)" if self._isTerminal() \
+        else " (nonterminal)"
