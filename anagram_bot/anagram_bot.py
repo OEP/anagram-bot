@@ -22,9 +22,24 @@ def _matchCase(model, text):
 
 class AnagramBot:
 
+  OUT_STDOUT = 1
+  OUT_MAINTAINER = 2
+  OUT_REPLY = 4
+
   def __init__(self):
     self._reddit = reddit.Reddit(user_agent='anagram_bot')
     self._anagram = anagram.Anagram()
+    self._maintainer = None
+    self._output = AnagramBot.OUT_STDOUT
+
+  def setMaintainer(self, username):
+    self._maintainer = username
+
+  def setOutput(self, outputMode):
+    self._output = outputMode
+
+  def login(self, username, password):
+    self._reddit.login(username, password)
 
   def makeFunny(self):
     comments = list(self._fetchComments())
@@ -42,7 +57,7 @@ class AnagramBot:
         attempts.append( (comment,anagrams) )
 
     if len(attempts) == 0:
-      return None
+      return
 
     attempts = sorted(attempts, key=lambda x: len(x[1][0][1]))
     (comment, anagrams) = attempts[1]
@@ -50,10 +65,25 @@ class AnagramBot:
     anagrams = filter(lambda x: len(x[1]) > 3, anagrams)
 
     reply = self._replace(comment.body, anagrams)
+    self._sendFunny(comment, reply)
 
-    print comment.body
-    print "=================================="
-    print reply
+  def _sendFunny(self, comment, reply):
+    if self._output & AnagramBot.OUT_STDOUT:
+      print comment.body
+      print "===================="
+      print reply
+    
+    if self._output & AnagramBot.OUT_MAINTAINER:
+      self._debugPM(comment.permalink + "\n\n" + reply)
+    
+    if self._output & AnagramBot.OUT_REPLY:
+      comment.reply( reply )
+
+  def _debugPM(self, message):
+    if self._maintainer == None:
+      raise ValueError("No maintainer is set! Use setMaintainer(str).")
+    self._reddit.compose_message(self._maintainer, "AnagramBot debug",
+      message)
 
   def _replace(self, text, anagrams):
     for anagram in anagrams:
