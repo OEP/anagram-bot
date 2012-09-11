@@ -97,7 +97,7 @@ class AnagramBot:
     response = raw_input("Send this [YES/NO]? ")
     if response.strip() == "YES":
       print "Sending reply..."
-      comment.reply(response)
+      comment.reply(reply)
     else:
       print "Aborted."
 
