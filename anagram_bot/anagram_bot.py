@@ -28,16 +28,26 @@ class AnagramBot:
 
   def makeFunny(self):
     comments = list(self._fetchComments())
-    attempts = 0
+    attempts = []
     anagrams = []
+    maxAttempts = 20
+    i = 0
 
-    while len(anagrams) == 0 and attempts < 10:
-      attempts += 1
+    while len(attempts) < 10 and i < maxAttempts:
+      i += 1
       comment = random.choice(comments)
       anagrams = self._attempt(comment.body)
+      anagrams = sorted(anagrams, key=lambda x: len(x[1]))
+      if len(anagrams) > 0:
+        attempts.append( (comment,anagrams) )
 
-    if len(anagrams) == 0:
+    if len(attempts) == 0:
       return None
+
+    attempts = sorted(attempts, key=lambda x: len(x[1][0][1]))
+    (comment, anagrams) = attempts[1]
+
+    anagrams = filter(lambda x: len(x[1]) > 3, anagrams)
 
     reply = self._replace(comment.body, anagrams)
 

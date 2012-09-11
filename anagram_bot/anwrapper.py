@@ -8,7 +8,7 @@ import os
 import anagram
 
 GOOD_NUMBER = 32000
-GOOD_MINIMUM = 3
+GOOD_MINIMUM = 2
 
 def pickRandom(cipher):
   tmp = friendly_an(cipher)
@@ -25,8 +25,7 @@ def friendly_an(cipher,
   length=None,
   number=GOOD_NUMBER):
   """Wraps 'good' parameters."""
-
-  length = len(cipher.split(" "))
+  global GOOD_MINIMUM
 
   return an(cipher,
     dictionary,

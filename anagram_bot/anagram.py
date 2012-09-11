@@ -25,10 +25,12 @@ class Anagram:
   DEFAULT_KEY = lambda x:x
   
   def __init__(self,
-    wordlist='wordlists/simple.txt',
+    wordlist='/usr/share/dict/words',
+    multipleWords=False,
     minWordSize=1):
 
     self._minWordSize = minWordSize
+    self._multipleWords = multipleWords
     self._roots = dict()
 
     fp = open(wordlist)
@@ -52,6 +54,10 @@ class Anagram:
   
   def solveRandom(self, cipher, maxSolutions=DEFAULT_MAX):
     return self.solve(cipher, maxSolutions, lambda x: random.random())
+
+  def canRecur(self):
+    return self._multipleWords
+
 
   def solve(self, cipher, maxSolutions=DEFAULT_MAX, key=DEFAULT_KEY):
     charmap = self._formatCipher(filterCipher(cipher))
@@ -124,7 +130,7 @@ class Anagram:
       tmpMap = _deductKey(charMap, self._letter)
       keys = set(tmpMap.keys()) & set(self._nextMap.keys())
 
-      if self._isTerminal():
+      if self._isTerminal() and self._parent.canRecur():
         keys.add(None)
 
       if len(tmpMap) == 0 and self._isTerminal():
