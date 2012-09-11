@@ -6,7 +6,7 @@ from config import USERNAME, PASSWORD, MAINTAINER
 def main():
   bot = AnagramBot()
   bot.setMaintainer(MAINTAINER)
-  bot.setOutput(AnagramBot.OUT_MAINTAINER | AnagramBot.OUT_STDOUT)
+  bot.setOutput(AnagramBot.OUT_DEBUG_REPLY)
   bot.login(USERNAME, PASSWORD)
   bot.makeFunny()
 

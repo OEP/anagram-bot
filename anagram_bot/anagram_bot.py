@@ -25,6 +25,7 @@ class AnagramBot:
   OUT_STDOUT = 1
   OUT_MAINTAINER = 2
   OUT_REPLY = 4
+  OUT_DEBUG_REPLY = 8
 
   def __init__(self):
     self._reddit = reddit.Reddit(user_agent='anagram_bot')
@@ -69,13 +70,14 @@ class AnagramBot:
 
   def _sendFunny(self, comment, reply):
     if self._output & AnagramBot.OUT_STDOUT:
-      print comment.body
-      print "===================="
-      print reply
+      self._printReply(comment, reply)
     
     if self._output & AnagramBot.OUT_MAINTAINER:
       self._debugPM(comment.permalink + "\n\n" + reply)
-    
+   
+    if self._output & AnagramBot.OUT_DEBUG_REPLY:
+      self._moderatedReply(comment, reply)
+
     if self._output & AnagramBot.OUT_REPLY:
       comment.reply( reply )
 
@@ -84,6 +86,20 @@ class AnagramBot:
       raise ValueError("No maintainer is set! Use setMaintainer(str).")
     self._reddit.compose_message(self._maintainer, "AnagramBot debug",
       message)
+
+  def _printReply(self, comment, reply):
+    print comment.body
+    print "==================="
+    print reply
+
+  def _moderatedReply(self, comment, reply):
+    self._printReply(comment,reply)
+    response = raw_input("Send this [YES/NO]? ")
+    if response.strip() == "YES":
+      print "Sending reply..."
+      comment.reply(response)
+    else:
+      print "Aborted."
 
   def _replace(self, text, anagrams):
     for anagram in anagrams:
