@@ -15,7 +15,8 @@ class AnagramTests(unittest.TestCase):
 
 
   def get(self, path):
-    return self._anagrams.setdefault(path, anagram.Anagram(path))
+    return self._anagrams.setdefault(path, anagram.Anagram(path,
+      multipleWords=True))
 
   def test_aaBuiltCorrectly(self):
     for pair in self._anagrams.items():
