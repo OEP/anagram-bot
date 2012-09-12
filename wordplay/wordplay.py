@@ -65,7 +65,6 @@ class Wordplay:
     return self._multipleWords
 
   def solve(self, cipher, maxSolutions=DEFAULT_MAX, sortKey=DEFAULT_KEY):
-    print "SOLVE: ", cipher
     charMap = self._formatCipher(filterCipher(cipher))
     solutions = 0
 
@@ -81,7 +80,6 @@ class Wordplay:
 
     for key in sorted(keys, key=sortKey):
       node = root._get(key)
-      print node, charMap
       for solution in self._solveAnagramRecursive(charMap, sortKey, node):
         yield solution
 
@@ -96,6 +94,8 @@ class Wordplay:
       yield node._letter
     elif len(tmpMap) == 0:
       pass
+    elif len(keys) == 0:
+      pass
     else:
       for key in sorted(keys, key=sortKey):
         solutionGen = None
@@ -105,9 +105,8 @@ class Wordplay:
           solutionGen = self._solveAnagramEntry(tmpMap, sortKey)
           prefix += " "
         else:
-          print "Getting key", key
-          node = node._get(key)
-          solutionGen = self._solveAnagramRecursive(tmpMap, sortKey, node)
+          recurNode = node._get(key)
+          solutionGen = self._solveAnagramRecursive(tmpMap, sortKey, recurNode)
 
         for subSolution in solutionGen:
           if subSolution != None:
