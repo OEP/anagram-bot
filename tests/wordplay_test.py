@@ -7,11 +7,13 @@ class WordplayTest(unittest.TestCase):
   WORDLIST1 = 'wordlists/test1.txt'
   WORDLIST2 = 'wordlists/test2.txt'
   SOLUTION2 = 'wordlists/result2.txt'
+  PALINDROMES = 'wordlists/one-word-palindromes.txt'
 
   def setUp(self):
     self._anagrams = dict()
     self.get(WordplayTest.WORDLIST1)
     self.get(WordplayTest.WORDLIST2)
+    self.get(WordplayTest.PALINDROMES)
 
 
   def get(self, path):
@@ -26,13 +28,21 @@ class WordplayTest(unittest.TestCase):
       words = self._getLines(path)
       for word in words:
         self.assertTrue( anagram.has(word) )
+
+  def test_simplePalindrome(self):
+    wp = self.get(WordplayTest.PALINDROMES)
+    for palindrome in self._getLines(WordplayTest.PALINDROMES):
+      print "Input:", palindrome
+      out = list( wp.solvePalindrome(palindrome) )
+      print "Output:", out
+      self.assertTrue( palindrome in out )
     
 
   def test_oneWord(self):
     anagram = self.get(WordplayTest.WORDLIST1)
     solution = self._getLines(WordplayTest.WORDLIST1)
     start = solution[0]
-    out = list(anagram.solve(start, len(solution) + 1))
+    out = list(anagram.solveAnagram(start, len(solution) + 1))
     self.assertEqual(sorted(solution),sorted(out))
 
   def test_twoWords(self):
@@ -40,7 +50,7 @@ class WordplayTest(unittest.TestCase):
     solution = self._getLines(WordplayTest.SOLUTION2)
     start = solution[0]
     solution = set(solution)
-    out = set(anagram.solve(start, len(solution) + 30))
+    out = set(anagram.solveAnagram(start, len(solution) + 30))
     self.assertEqual(solution, out)
 
   def _getLines(self, filename):
