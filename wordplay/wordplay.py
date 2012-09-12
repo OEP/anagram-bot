@@ -1,5 +1,5 @@
 """
-Anagram class.
+Wordplay class.
 """
 
 import string
@@ -19,7 +19,7 @@ def filterCipher(charsequence):
   """Returns allowed set of anagram characters in 'charsequence'."""
   return filter(lambda x: x in anagram_characters, charsequence)
 
-class Anagram:
+class Wordplay:
 
   DEFAULT_MAX = 1
   DEFAULT_KEY = lambda x:x
@@ -101,7 +101,7 @@ class Anagram:
 
   def _setDefault(self, char):
     """Returns root node for 'char' or create if it does not exist."""
-    return self._roots.setdefault(char, Anagram.Node(self, char))
+    return self._roots.setdefault(char, Wordplay.Node(self, char))
 
   def _addWord(self, word):
     """Adds word to the trie."""
@@ -163,7 +163,7 @@ class Anagram:
       return self._nextMap.get(letter)
 
     def _setDefault(self, letter):
-      return self._nextMap.setdefault(letter, Anagram.Node(self._parent, letter))
+      return self._nextMap.setdefault(letter, Wordplay.Node(self._parent, letter))
 
     def __str__(self):
       return self._letter

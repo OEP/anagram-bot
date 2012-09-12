@@ -1,8 +1,8 @@
 import unittest
 
-from anagram_bot import anagram
+from wordplay.wordplay import Wordplay
 
-class AnagramTests(unittest.TestCase):
+class WordplayTest(unittest.TestCase):
 
   WORDLIST1 = 'wordlists/test1.txt'
   WORDLIST2 = 'wordlists/test2.txt'
@@ -10,12 +10,12 @@ class AnagramTests(unittest.TestCase):
 
   def setUp(self):
     self._anagrams = dict()
-    self.get(AnagramTests.WORDLIST1)
-    self.get(AnagramTests.WORDLIST2)
+    self.get(WordplayTest.WORDLIST1)
+    self.get(WordplayTest.WORDLIST2)
 
 
   def get(self, path):
-    return self._anagrams.setdefault(path, anagram.Anagram(path,
+    return self._anagrams.setdefault(path, Wordplay(path,
       multipleWords=True))
 
   def test_aaBuiltCorrectly(self):
@@ -29,15 +29,15 @@ class AnagramTests(unittest.TestCase):
     
 
   def test_oneWord(self):
-    anagram = self.get(AnagramTests.WORDLIST1)
-    solution = self._getLines(AnagramTests.WORDLIST1)
+    anagram = self.get(WordplayTest.WORDLIST1)
+    solution = self._getLines(WordplayTest.WORDLIST1)
     start = solution[0]
     out = list(anagram.solve(start, len(solution) + 1))
     self.assertEqual(sorted(solution),sorted(out))
 
   def test_twoWords(self):
-    anagram = self.get(AnagramTests.WORDLIST2)
-    solution = self._getLines(AnagramTests.SOLUTION2)
+    anagram = self.get(WordplayTest.WORDLIST2)
+    solution = self._getLines(WordplayTest.SOLUTION2)
     start = solution[0]
     solution = set(solution)
     out = set(anagram.solve(start, len(solution) + 30))

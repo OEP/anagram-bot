@@ -1,3 +1,6 @@
+# Vim swps
+*.swp
+
 *.py[co]
 
 # Packages

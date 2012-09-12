@@ -1,8 +1,9 @@
-import reddit
 import random
-import anagram
 import re
 import string
+
+from reddit import Reddit
+from wordplay.wordplay import Wordplay
 
 def _matchCase(model, text):
   i = 0
@@ -28,8 +29,8 @@ class AnagramBot:
   OUT_DEBUG_REPLY = 8
 
   def __init__(self):
-    self._reddit = reddit.Reddit(user_agent='anagram_bot')
-    self._anagram = anagram.Anagram()
+    self._reddit = Reddit(user_agent='anagram_bot')
+    self._anagram = Wordplay()
     self._maintainer = None
     self._output = AnagramBot.OUT_STDOUT
 
@@ -53,15 +54,15 @@ class AnagramBot:
       i += 1
       comment = random.choice(comments)
       anagrams = self._attempt(comment.body)
-      anagrams = sorted(anagrams, key=lambda x: len(x[1]))
+      anagrams = sorted(anagrams, key=lambda x: -len(x[1]))
       if len(anagrams) > 0:
         attempts.append( (comment,anagrams) )
 
     if len(attempts) == 0:
       return
 
-    attempts = sorted(attempts, key=lambda x: len(x[1][0][1]))
-    (comment, anagrams) = attempts[1]
+    attempts = sorted(attempts, key=lambda x: -len(x[1][0][1]))
+    (comment, anagrams) = attempts[0]
 
     anagrams = filter(lambda x: len(x[1]) > 3, anagrams)
 
@@ -94,6 +95,7 @@ class AnagramBot:
 
   def _moderatedReply(self, comment, reply):
     self._printReply(comment,reply)
+    print comment.permalink
     response = raw_input("Send this [YES/NO]? ")
     if response.strip() == "YES":
       print "Sending reply..."
