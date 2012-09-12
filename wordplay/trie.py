@@ -3,14 +3,14 @@
 class Trie:
 
   def __init__(self):
-    self._roots = dict()
+    self._root = Trie.Node(None,None)
   
   def has(self, key):
     """Returns true if 'key' is present in trie."""
     if len(key) == 0 or key == None:
       raise ValueError("Key can't be length 0 or None.")
-    node = self._getRoot(key[0])
-    for c in key[1:]:
+    node = self._root
+    for c in key:
       if node == None:
         return False
       node = node._get(c)
@@ -18,7 +18,7 @@ class Trie:
   
   def addWord(self, word):
     """Adds word to the trie."""
-    node = None
+    node = self._root
     for c in word:
       if node == None:
         node = self._setDefault(c)
@@ -26,14 +26,6 @@ class Trie:
         node = node._setDefault(c)
     node._flagTerminal()
 
-  def _getRoot(self, char):
-    """Returns a root node representing 'char'."""
-    return self._roots.get(char, None)
-
-  def _setDefault(self, char):
-    """Returns root node for 'char' or create if it does not exist."""
-    return self._roots.setdefault(char, Trie.Node(self, char))
-  
   class Node:
     
     def __init__(self, parent, letter):
@@ -41,32 +33,8 @@ class Trie:
       self._nextMap = dict()
       self._parent = parent
 
-    def solve(self, charMap, sortKey):
-      tmpMap = _deductKey(charMap, self._letter)
-      keys = set(tmpMap.keys()) & set(self._nextMap.keys())
-
-      if self._isTerminal() and self._parent.canRecur():
-        keys.add(None)
-
-      if len(tmpMap) == 0 and self._isTerminal():
-        yield self._letter
-      elif len(tmpMap) == 0:
-        pass
-      else:
-        for key in sorted(keys, key=sortKey):
-          solutionGen = None
-          prefix = self._letter
-
-          if key == None:
-            solutionGen = self._parent._solveRecursive(tmpMap, sortKey)
-            prefix += " "
-          else:
-            node = self._get(key)
-            solutionGen = node.solve(tmpMap, sortKey)
-
-          for subSolution in solutionGen:
-            if subSolution != None:
-              yield prefix + subSolution
+    def keys(self):
+      return self._nextMap.keys()
 
     def _flagTerminal(self):
       self._nextMap[None] = None
@@ -78,7 +46,7 @@ class Trie:
       return self._nextMap.get(letter)
 
     def _setDefault(self, letter):
-      return self._nextMap.setdefault(letter, Wordplay.Node(self._parent, letter))
+      return self._nextMap.setdefault(letter, Trie.Node(self._parent, letter))
 
     def __str__(self):
       return self._letter

@@ -43,6 +43,9 @@ class Wordplay:
       ## TODO: Reverse trie
     fp.close()
 
+  def has(self, word):
+    return self._forwardTrie.has(word) ## and TODO: reverseTrie
+
   def pickRandom(self, cipher):
     """Picks a random anagram of cipher and returns it or None."""
     result = list(self.solveRandom(cipher,1))
@@ -61,21 +64,54 @@ class Wordplay:
   def canRecur(self):
     return self._multipleWords
 
-  def solve(self, cipher, maxSolutions=DEFAULT_MAX, key=DEFAULT_KEY):
-    charmap = self._formatCipher(filterCipher(cipher))
+  def solve(self, cipher, maxSolutions=DEFAULT_MAX, sortKey=DEFAULT_KEY):
+    print "SOLVE: ", cipher
+    charMap = self._formatCipher(filterCipher(cipher))
     solutions = 0
 
-    for solution in self._solveRecursive(charmap, key):
+    for solution in self._solveAnagramEntry(charMap, sortKey):
+      solutions += 1
+      yield solution
       if solutions >= maxSolutions:
         break
-      yield solution
+  
+  def _solveAnagramEntry(self, charMap, sortKey):
+    root = self._forwardTrie._root
+    keys = set(charMap.keys()) & set(root.keys())
 
-  def _solveRecursive(self, charmap, key):
-    keys = set(charmap.keys()) & set(self._roots.keys())
-    for char in sorted(keys, key=key):
-      for solution in self._roots[char].solve(charmap, key):
-        if solution != None:
-          yield solution
+    for key in sorted(keys, key=sortKey):
+      node = root._get(key)
+      print node, charMap
+      for solution in self._solveAnagramRecursive(charMap, sortKey, node):
+        yield solution
+
+  def _solveAnagramRecursive(self, charmap, sortKey, node):
+    tmpMap = _deductKey(charmap, node._letter)
+    keys = set(tmpMap.keys()) & set(node._nextMap.keys())
+
+    if node._isTerminal() and self.canRecur():
+      keys.add(None)
+
+    if len(tmpMap) == 0 and node._isTerminal():
+      yield node._letter
+    elif len(tmpMap) == 0:
+      pass
+    else:
+      for key in sorted(keys, key=sortKey):
+        solutionGen = None
+        prefix = node._letter
+
+        if key == None:
+          solutionGen = self._solveAnagramEntry(tmpMap, sortKey)
+          prefix += " "
+        else:
+          print "Getting key", key
+          node = node._get(key)
+          solutionGen = self._solveAnagramRecursive(tmpMap, sortKey, node)
+
+        for subSolution in solutionGen:
+          if subSolution != None:
+            yield prefix + subSolution
   
   def _formatCipher(self, cipher):
     charmap = dict()
@@ -88,7 +124,7 @@ class Wordplay:
     word = word.strip().upper()
     if len(word) < self._minWordSize:
       return
-    self._forwardTrie.add(word)
+    self._forwardTrie.addWord(word)
     ## TODO: Add reverse trie
 
 
