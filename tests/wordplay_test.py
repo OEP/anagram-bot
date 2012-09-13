@@ -25,8 +25,8 @@ class WordplayTest(unittest.TestCase):
     random.shuffle(charList)
 
     solution = set(self._getLines(WordplayTest.SOLUTION_BIGPALINDROME))
-    out = set(wp.solvePalindrome("".join(charList),20))
-    self.assertEqual(solution, out)
+    for out in wp.solvePalindrome("".join(charList),200):
+      self.assertTrue(out in solution)
 
   def get(self, path):
     return self._anagrams.setdefault(path, Wordplay(path,

@@ -46,7 +46,7 @@ class Trie:
       return self._nextMap.get(letter)
 
     def _setDefault(self, letter):
-      return self._nextMap.setdefault(letter, Trie.Node(self._parent, letter))
+      return self._nextMap.setdefault(letter, Trie.Node(self, letter))
 
     def __str__(self):
       return self._letter

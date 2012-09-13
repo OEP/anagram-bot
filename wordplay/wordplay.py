@@ -154,9 +154,16 @@ class Wordplay:
           if subSolution != None:
             yield prefix + subSolution + suffix
 
-  def _validWord(self, fnode, rnode, middle=""):
-    ## TODO
-    return True
+  def _validWord(self, fnode, rnode, middle):
+    while fnode._parent and fnode._parent._letter != None:
+      fnode = fnode._parent
+      middle = fnode._letter + middle
+
+    while rnode._parent and rnode._parent._letter != None:
+      rnode = rnode._parent
+      middle = middle + rnode._letter
+
+    return self.has(middle)
 
   def _solveAnagramEntry(self, charMap, sortKey):
     root = self._forwardTrie._root
