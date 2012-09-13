@@ -91,6 +91,7 @@ class Wordplay:
   def _solvePalindromeEntry(self, charMap, sortKey, froot=None, rroot=None):
     if froot == None: froot = self._forwardTrie._root
     if rroot == None: rroot = self._reverseTrie._root
+    #print "entry", froot, rroot
     keys = set(charMap.keys()) & \
       set(froot.keys()) & \
       set(rroot.keys())
@@ -103,22 +104,24 @@ class Wordplay:
         yield solution
 
   def _solvePalindromeRecursive(self, charMap, sortKey, fnode, rnode):
-    tmpMap = _deductKey(charMap, fnode._letter, 2)
+    #print "recur", fnode, rnode
+    count = min(charMap[fnode._letter], 2)
+    tmpMap = _deductKey(charMap, fnode._letter, count)
     keys = set(tmpMap.keys()) & \
       set(rnode.keys()) & \
       set(fnode.keys())
 
     if fnode._isTerminal() and self.canRecur():
-      keys.append(Wordplay.END_FRONT)
+      keys.add(Wordplay.END_FRONT)
 
     if rnode._isTerminal() and self.canRecur():
-      keys.append(Wordplay.END_REAR)
+      keys.add(Wordplay.END_REAR)
 
-    if rnode._isTerminal() and fnode._isTerminal and self.canRecur():
-      keys.append(Wordplay.END_BOTH)
+    if rnode._isTerminal() and fnode._isTerminal() and self.canRecur():
+      keys.add(Wordplay.END_BOTH)
     
-    if len(tmpMap) == 0 and self._validWord(fnode, rnode):
-      yield ""
+    if len(tmpMap) == 0 and self._validWord(fnode, rnode, count*fnode._letter):
+      yield count*fnode._letter
     elif len(tmpMap) == 0:
       pass
     elif len(keys) == 0:
@@ -130,15 +133,15 @@ class Wordplay:
         suffix = rnode._letter
 
         if key == Wordplay.END_FRONT:
-          solutionGen = self._solvePalindromeRecursive(tmpMap, sortKey, None,
+          solutionGen = self._solvePalindromeEntry(tmpMap, sortKey, None,
             rnode)
           prefix += " "
         elif key == Wordplay.END_REAR:
-          solutionGen = self._solvePalindromeRecursive(tmpMap, sortKey, fnode,
+          solutionGen = self._solvePalindromeEntry(tmpMap, sortKey, fnode,
             None)
           suffix = " " + suffix
         elif key == Wordplay.END_BOTH:
-          solutionGen = self._solvePalindromeRecursive(tmpMap, sortKey)
+          solutionGen = self._solvePalindromeEntry(tmpMap, sortKey)
           suffix = " " + suffix
           prefix += " "
         else:
@@ -151,7 +154,7 @@ class Wordplay:
           if subSolution != None:
             yield prefix + subSolution + suffix
 
-  def _validWord(self, fnode, rnode):
+  def _validWord(self, fnode, rnode, middle=""):
     ## TODO
     return True
 

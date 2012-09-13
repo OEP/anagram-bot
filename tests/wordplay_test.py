@@ -1,4 +1,5 @@
 import unittest
+import random
 
 from wordplay.wordplay import Wordplay
 
@@ -8,12 +9,15 @@ class WordplayTest(unittest.TestCase):
   WORDLIST2 = 'wordlists/test2.txt'
   SOLUTION2 = 'wordlists/result2.txt'
   PALINDROMES = 'wordlists/one-word-palindromes.txt'
+  BIGPALINDROME = 'wordlists/big-palindrome.txt'
+  SOLUTION_BIGPALINDROME = 'wordlists/result-big-palindrome.txt'
 
   def setUp(self):
     self._anagrams = dict()
     self.get(WordplayTest.WORDLIST1)
     self.get(WordplayTest.WORDLIST2)
     self.get(WordplayTest.PALINDROMES)
+    self.get(WordplayTest.BIGPALINDROME)
 
 
   def get(self, path):
@@ -32,11 +36,17 @@ class WordplayTest(unittest.TestCase):
   def test_simplePalindrome(self):
     wp = self.get(WordplayTest.PALINDROMES)
     for palindrome in self._getLines(WordplayTest.PALINDROMES):
-      print "Input:", palindrome
       out = list( wp.solvePalindrome(palindrome) )
-      print "Output:", out
       self.assertTrue( palindrome in out )
-    
+
+  def test_bigPalindrome(self):
+    wp = self.get(WordplayTest.BIGPALINDROME)
+    charList = list("WASITABARORABATISAW")
+    random.shuffle(charList)
+
+    solution = set(self._getLines(WordplayTest.SOLUTION_BIGPALINDROME))
+    out = set(wp.solvePalindrome("".join(charList),20))
+    self.assertEqual(solution, out)
 
   def test_oneWord(self):
     anagram = self.get(WordplayTest.WORDLIST1)
