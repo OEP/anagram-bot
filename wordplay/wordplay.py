@@ -23,7 +23,7 @@ def filterCipher(charsequence):
 
 class Wordplay:
 
-  DEFAULT_MAX = 1
+  DEFAULT_MAX = 0
   DEFAULT_KEY = lambda x:x
 
   END_FRONT = 1
@@ -75,7 +75,7 @@ class Wordplay:
     for solution in self._solveAnagramEntry(charMap, sortKey):
       solutions += 1
       yield solution
-      if solutions >= maxSolutions:
+      if solutions >= maxSolutions and maxSolutions > 0:
         break
 
   def solvePalindrome(self, cipher, maxSolutions=DEFAULT_MAX,
@@ -85,7 +85,7 @@ class Wordplay:
     for solution in self._solvePalindromeEntry(charMap,sortKey):
       solutions += 1
       yield solution
-      if solutions >= maxSolutions:
+      if solutions >= maxSolutions and maxSolutions > 0:
         break
 
   def _solvePalindromeEntry(self, charMap, sortKey, froot=None, rroot=None):

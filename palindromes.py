@@ -12,12 +12,9 @@ def main():
     printUsage(sys.argv[0])
     sys.exit(1)
 
-  print "Loading words."
-  wp = Wordplay('wordlists/simple.txt')
-  print "Finished."
+  wp = Wordplay('wordlists/simple.txt', multipleWords=True)
 
   for cipher in sys.argv[1:]:
-    print "Computing %s" % cipher
     count = 0
     for palindrome in wp.solvePalindrome(cipher):
       if len(sys.argv) > 2 and count == 0:
