@@ -27,6 +27,16 @@ def formatCipher(cipher):
     charmap[c] = 1 + charmap.get(c, 0)
   return charmap
 
+def possiblePalindrome(cipher):
+  charMap = formatCipher(cipher)
+  odd = 0
+  for value in charMap.values():
+    if not (value % 2) == 0 and odd == 0:
+      odd += 1
+    elif not (value % 2) == 0:
+      return False
+  return True
+
 class Wordplay:
 
   DEFAULT_MAX = 0
@@ -86,8 +96,13 @@ class Wordplay:
 
   def solvePalindrome(self, cipher, maxSolutions=DEFAULT_MAX,
     sortKey=DEFAULT_KEY):
+
+    if not possiblePalindrome(cipher):
+      raise StopIteration
+
     charMap = formatCipher(cipher)
     solutions = 0
+
     for solution in self._solvePalindromeEntry(charMap,sortKey):
       solutions += 1
       yield solution
@@ -97,7 +112,6 @@ class Wordplay:
   def _solvePalindromeEntry(self, charMap, sortKey, froot=None, rroot=None):
     if froot == None: froot = self._forwardTrie._root
     if rroot == None: rroot = self._reverseTrie._root
-    #print "entry", froot, rroot
     keys = set(charMap.keys()) & \
       set(froot.keys()) & \
       set(rroot.keys())
