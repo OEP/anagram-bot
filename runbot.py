@@ -8,7 +8,7 @@ def main():
   bot.setMaintainer(MAINTAINER)
   bot.setOutput(AnagramBot.OUT_STDOUT)
   bot.login(USERNAME, PASSWORD)
-  bot.makeFunny()
+  bot.postPalindrome()
 
 if __name__ == "__main__":
   main()

@@ -43,6 +43,16 @@ class AnagramBot:
   def login(self, username, password):
     self._reddit.login(username, password)
 
+  def postPalindrome(self):
+    comments = list(self._fetchComments())
+
+    for comment in comments:
+      palindrome = self._anagram.pickRandomPalindrome(comment.body)
+      if palindrome != None:
+        print palindrome
+      else:
+        print "Nope:", comment.body[:70].replace("\n", "")
+
   def makeFunny(self):
     comments = list(self._fetchComments())
     attempts = []
@@ -115,7 +125,7 @@ class AnagramBot:
     result = []
     noMatches = True
     for match in re.findall("[A-Za-z'0-9]+", text):
-      for anagram in self._anagram.solveRandom(match, 5):
+      for anagram in self._anagram.solveRandomAnagram(match, 5):
         if anagram != None and anagram != match.upper():
           anagram = _matchCase(match, anagram)
           result.append( (match, anagram) )

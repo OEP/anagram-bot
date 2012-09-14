@@ -47,7 +47,7 @@ class Wordplay:
   END_BOTH = 3
 
   def __init__(self,
-    wordlist='/usr/share/dict/words',
+    wordlist='wordlists/simple.txt',
     multipleWords=False,
     minWordSize=1):
 
@@ -66,9 +66,14 @@ class Wordplay:
     return self._forwardTrie.has(word) and \
       self._reverseTrie.has(word[::-1])
 
-  def pickRandom(self, cipher):
+  def pickRandomAnagram(self, cipher):
     """Picks a random anagram of cipher and returns it or None."""
-    result = list(self.solveRandom(cipher,1))
+    result = list(self.solveRandomAnagram(cipher,1))
+    if len(result) == 0: return None
+    return result[0]
+
+  def pickRandomPalindrome(self, cipher):
+    result = list(self.solveRandomPalindrome(cipher, 1))
     if len(result) == 0: return None
     return result[0]
 
@@ -77,9 +82,13 @@ class Wordplay:
     result = list(self.solve(cipher,1))
     if len(result) == 0: return None
     return result[0]
+
+  def solveRandomPalindrome(self, cipher, maxSolutions=DEFAULT_MAX):
+    return self.solvePalindrome(cipher, maxSolutions, lambda x:
+      random.random())
   
-  def solveRandom(self, cipher, maxSolutions=DEFAULT_MAX):
-    return self.solve(cipher, maxSolutions, lambda x: random.random())
+  def solveRandomAnagram(self, cipher, maxSolutions=DEFAULT_MAX):
+    return self.solveAnagram(cipher, maxSolutions, lambda x: random.random())
 
   def canRecur(self):
     return self._multipleWords
