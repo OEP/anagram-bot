@@ -21,6 +21,12 @@ def filterCipher(charsequence):
   """Returns allowed set of anagram characters in 'charsequence'."""
   return filter(lambda x: x in anagram_characters, charsequence)
 
+def formatCipher(cipher):
+  charmap = dict()
+  for c in filterCipher(cipher).upper():
+    charmap[c] = 1 + charmap.get(c, 0)
+  return charmap
+
 class Wordplay:
 
   DEFAULT_MAX = 0
@@ -69,7 +75,7 @@ class Wordplay:
     return self._multipleWords
 
   def solveAnagram(self, cipher, maxSolutions=DEFAULT_MAX, sortKey=DEFAULT_KEY):
-    charMap = self._formatCipher(cipher)
+    charMap = formatCipher(cipher)
     solutions = 0
 
     for solution in self._solveAnagramEntry(charMap, sortKey):
@@ -80,7 +86,7 @@ class Wordplay:
 
   def solvePalindrome(self, cipher, maxSolutions=DEFAULT_MAX,
     sortKey=DEFAULT_KEY):
-    charMap = self._formatCipher(cipher)
+    charMap = formatCipher(cipher)
     solutions = 0
     for solution in self._solvePalindromeEntry(charMap,sortKey):
       solutions += 1
@@ -104,9 +110,12 @@ class Wordplay:
         yield solution
 
   def _solvePalindromeRecursive(self, charMap, sortKey, fnode, rnode):
-    #print "recur", fnode, rnode
     count = min(charMap[fnode._letter], 2)
     tmpMap = _deductKey(charMap, fnode._letter, count)
+
+    if count == 1 and len(tmpMap) != 0:
+      raise StopIteration
+
     keys = set(tmpMap.keys()) & \
       set(rnode.keys()) & \
       set(fnode.keys())
@@ -203,11 +212,6 @@ class Wordplay:
           if subSolution != None:
             yield prefix + subSolution
   
-  def _formatCipher(self, cipher):
-    charmap = dict()
-    for c in filterCipher(cipher).upper():
-      charmap[c] = 1 + charmap.get(c, 0)
-    return charmap
 
 
   def _addWord(self, word):

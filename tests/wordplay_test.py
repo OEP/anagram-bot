@@ -1,7 +1,7 @@
 import unittest
 import random
 
-from wordplay.wordplay import Wordplay
+from wordplay.wordplay import Wordplay, formatCipher
 
 class WordplayTest(unittest.TestCase):
 
@@ -12,6 +12,7 @@ class WordplayTest(unittest.TestCase):
   BIGPALINDROME = 'wordlists/big-palindrome.txt'
   SOLUTION_BIGPALINDROME = 'wordlists/result-big-palindrome.txt'
   SIMPLE = 'wordlists/simple.txt'
+  FAMOUS = 'wordlists/famous-palindromes.txt'
 
   def setUp(self):
     self._anagrams = dict()
@@ -54,6 +55,17 @@ class WordplayTest(unittest.TestCase):
   def test_realWorld(self):
     wp = self.get(WordplayTest.SIMPLE)
     self._simplePalindrome(wp)
+
+  def test_sanity(self):
+    wp = self.get(WordplayTest.SIMPLE)
+    ciphers = self._getLines(WordplayTest.FAMOUS)
+
+    for cipher in ciphers:
+      charMap = formatCipher(cipher)
+      for palindrome in wp.solvePalindrome(cipher):
+        outCharMap = formatCipher(palindrome)
+        self.assertEqual(charMap, outCharMap)
+
 
   def test_oneWord(self):
     anagram = self.get(WordplayTest.WORDLIST1)
